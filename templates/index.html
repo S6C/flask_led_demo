@@ -1,0 +1,42 @@
+{% extends "base.html" %} {% block content %}
+
+<form>
+  <div class="form-group">
+    <label for="led">LED</label>
+    <input type="checkbox" id="led" name="led" />
+  </div>
+</form>
+
+{% endblock %} {% block scripts %}
+<script>
+  window.addEventListener("load", function() {
+    ajaxCall("GET");
+  });
+
+  document.getElementById("led").addEventListener("change", function() {
+    ajaxCall("POST");
+  });
+
+  function ajaxCall(type, json = "", address = "/lights/led") {
+    var xhttp = new XMLHttpRequest();
+    if (type === "GET") {
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          var data = JSON.parse(this.responseText);
+          console.log(data["led"]);
+          document.getElementById("led").checked = data["led"];
+        }
+      };
+      xhttp.open("GET", "/lights/led", true);
+      xhttp.send();
+    }
+    if (type === "POST") {
+      xhttp.open("POST", address, true);
+      xhttp.setRequestHeader("Content-type", "application/json");
+      var data = document.getElementById("led").checked;
+      console.log(JSON.stringify({ led: data }));
+      xhttp.send(JSON.stringify({ led: data }));
+    }
+  }
+</script>
+{% endblock %}
